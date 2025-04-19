@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import aiofiles
 from PyPDF2 import PdfReader
 import os
@@ -53,6 +54,14 @@ def get_qa_chain():
     return chain
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace ["*"] with ["https://your-frontend.vercel.app"] in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/career-recommend/")
 async def get_career_path(file: UploadFile = File(...)):

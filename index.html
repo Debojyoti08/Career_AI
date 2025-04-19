@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Career Recommendation by Gemini AI</title>
+
+  <!-- ✅ Optional: Enforce stricter CSP headers if hosting via Firebase or Vercel (set in headers config, not here in meta) -->
+
   <style>
     * {
       box-sizing: border-box;
@@ -108,7 +112,7 @@
     <h1>Upload Resume for Career Recommendation</h1>
 
     <form id="uploadForm">
-      <input type="file" id="pdfFile" accept="application/pdf" required>
+      <input type="file" id="pdfFile" accept="application/pdf" required />
       <button type="submit">Get Recommendation</button>
     </form>
 
@@ -116,41 +120,41 @@
   </div>
 
   <script>
-    const form = document.getElementById("uploadForm");
-    const resultDiv = document.getElementById("result");
+    window.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("uploadForm");
+      const resultDiv = document.getElementById("result");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById("pdfFile");
-      const file = fileInput.files[0];
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const fileInput = document.getElementById("pdfFile");
+        const file = fileInput.files[0];
 
-      if (!file) {
-        resultDiv.innerHTML = "<p style='color: red;'>Please select a PDF file.</p>";
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      resultDiv.innerHTML = "<p class='loading'>🧠 Gemini AI is analyzing your resume...</p>";
-
-      try {
-        const response = await fetch("http://localhost:8000/career-recommend/", {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          resultDiv.innerHTML = `<h3>🧭 Career Path Recommendation:</h3><p>${data.career_path}</p>`;
-        } else {
-          resultDiv.innerHTML = `<p style="color:red;">❌ Error: ${data.error}</p>`;
+        if (!file) {
+          resultDiv.innerHTML = "<p style='color: red;'>Please select a PDF file.</p>";
+          return;
         }
 
-      } catch (error) {
-        resultDiv.innerHTML = `<p style="color:red;">⚠️ Request failed: ${error.message}</p>`;
-      }
+        const formData = new FormData();
+        formData.append("file", file);
+
+        resultDiv.innerHTML = "<p class='loading'>🧠 Gemini AI is analyzing your resume...</p>";
+
+        fetch("http://localhost:8000/career-recommend/", {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.career_path) {
+            resultDiv.innerHTML = `<h3>🧭 Career Path Recommendation:</h3><p>${data.career_path}</p>`;
+          } else {
+            resultDiv.innerHTML = `<p style="color:red;">❌ Error: ${data.error || "Something went wrong."}</p>`;
+          }
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `<p style="color:red;">⚠️ Request failed: ${error.message}</p>`;
+        });
+      });
     });
   </script>
 

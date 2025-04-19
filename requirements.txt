@@ -8,3 +8,4 @@ langchain-community
 google-generativeai
 uvicorn
 faiss-cpu
+python-multipart

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Career Recommendation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f0f2f5;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .loading {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Upload Resume for Career Recommendation</h1>
+
+  <form id="uploadForm">
+    <input type="file" id="pdfFile" accept="application/pdf" required>
+    <button type="submit">Get Recommendation</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("pdfFile");
+      const file = fileInput.files[0];
+      if (!file) {
+        resultDiv.textContent = "Please select a PDF file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      resultDiv.innerHTML = "<p class='loading'>Processing your resume with Gemini AI...</p>";
+
+      try {
+        const response = await fetch("http://localhost:8000/career-recommend/", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.innerHTML = `<h3>Career Recommendation:</h3><p>${data.career_path}</p>`;
+        } else {
+          resultDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        }
+
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color:red;">Request failed: ${error.message}</p>`;
+      }
+    });
+  </script>
+
+</body>
+</html>
